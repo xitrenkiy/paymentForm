@@ -1,0 +1,20 @@
+{
+	"cards": [
+		{
+			"id": "0",
+			"element": "<FaCcVisa style={{width: '60px', height: '60px', color: 'blue'}} />",
+			"type": "visa",
+			"name": "Domen Kralj",
+			"primary": "true",
+			"number": "**** 6775"
+		},
+		{
+			"id": "1",
+			"element": "<FaCcMastercard style={{width: '60px', height: '60px'}} />",
+			"type": "master",
+			"name": "Domen Kralj",
+			"primary": "false",
+			"number": "**** 3009"
+		}
+	]
+}
