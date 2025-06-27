@@ -8,9 +8,9 @@ const initialState = {
 
 export const fetchCards = createAsyncThunk(
 	'cards/fetchCards',
-	() => {
+	async (name) => {
 		const { request } = useHttp();
-		return request('http://localhost:3000/cards')
+		return await request(`http://localhost:3000/cards?name=${name}`)
 	}
 )
 
@@ -32,8 +32,8 @@ const cardsSlice = createSlice({
 		builder
 			.addCase(fetchCards.pending, state => {state.cardsLoadingStatus = 'loading'})
 			.addCase(fetchCards.fulfilled, (state, action) => {
-				state.cardsLoadingStatus = 'idle';
 				state.cards = action.payload;
+				state.cardsLoadingStatus = 'idle';
 			})
 			.addCase(fetchCards.rejected, state => {state.cardsLoadingStatus = 'error'})
 			.addDefaultCase(() => {})

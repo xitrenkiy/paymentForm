@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { cardDeleted, cardPrimaryToggle } from "../PaymentForm/cardsSlice";
 
 export const CardDetail = ({ toggleModal, type }) => {
-	const { cards } = useSelector(state => state);
+	const { cards } = useSelector(state => state.cards);
 	const dispatch = useDispatch();
 	const openedCard = cards.find(card => card.type === type);
 
@@ -13,7 +13,7 @@ export const CardDetail = ({ toggleModal, type }) => {
 	}
 
 	return (
-		<div className='absolute overflow-hidden w-full h-[52%] bg-white bottom-0 rounded-xl text-black p-5 animate-slideIn52'>
+		<div className='absolute overflow-hidden w-full h-[398px] bg-white bottom-0 rounded-xl text-black p-5 animate-slideIn52'>
 			<div className='flex justify-between'>
 				<h2 className='font-medium'>Card details</h2>
 				<button className='cursor-pointer' onClick={toggleModal}>⨉</button>

@@ -1,25 +1,39 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { createSelector } from "@reduxjs/toolkit";
 import { AddCard } from "../AddCard/AddCard";
 import { CardDetail } from "../CardDetail/CardDetail";
 
 import { fetchCards } from "./cardsSlice";
+import { fetchUsers } from "../../store/slices/userSlice";
 import { Loader } from "../Loader/Loader";
 
 import { FaBitcoin } from "react-icons/fa6";
 import { SiAdguard } from "react-icons/si";
 
 const PaymentForm = () => {
-	const { cards, cardsLoadingStatus } = useSelector(state => state);
+	const { cards, cardsLoadingStatus } = useSelector(state => state.cards);
+	const { usersLoadingStatus } = useSelector(state => state.users);
+	const filteredUserCardsSelector = createSelector(
+		(state) => state.users.users,
+		(users) => users?.find(user => user.id == 0)
+	);
+	const activeUserId = useSelector(filteredUserCardsSelector);
 	const dispatch = useDispatch();
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [isCardModalOpen, setIsCardModalOpen] = useState(false);
 	const [activeCardType, setActiveCardType] = useState('visa');
+	
+	useEffect(() => {
+		dispatch(fetchUsers());
+	}, [dispatch]);
 
 	useEffect(() => {
-		dispatch(fetchCards());
-	}, []);
+		if (activeUserId) {
+			dispatch(fetchCards(activeUserId.name));
+		}
+	}, [dispatch, activeUserId])
 
 	const handleClickAddButton = (func, state) => {
 		func(!state);
@@ -71,10 +85,14 @@ const PaymentForm = () => {
 								)
 							})}
 					</div>
-					<div className='flex items-center gap-4 mt-5 w-full bg-green-100 rounded-xl px-5 py-2 bottom-0'>
-						<SiAdguard style={{width: '35px', height: '35px'}} />
-						<div className='text-[14px] font-light'>We're fully complaint with the payment card indrustry data security standarts</div>
-					</div>
+						{cards.length > 0 && cardsLoadingStatus !== "loading" && usersLoadingStatus !== 'loading' ? 
+						<div className='flex items-center gap-4 mt-5 w-full bg-green-100 rounded-xl px-5 py-2 bottom-0'>
+							<SiAdguard style={{width: '35px', height: '35px'}} />
+							<div className='text-[14px] font-light'>We're fully complaint with the payment card indrustry data security standarts</div>
+						</div> : null}
+						{cards.length === 0 && cardsLoadingStatus !=='loading' && usersLoadingStatus !=='loading' ? <div className='w-full mx-auto text-center'>
+							Seems like you don`t have a card
+						</div> : null}
 				</div>
 
 				<div className='bg-white mt-2 min-h-50 text-black px-5 py-4'>

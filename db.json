@@ -1,10 +1,30 @@
 {
+	"users": [
+		{
+			"id": 0,
+			"name": "Andrey Pogorelov",
+			"country": "Ukraine",
+			"credits": 1000
+		},
+		{
+			"id": 1,
+			"name": "Maks Kurmaz",
+			"country": "United States"	,
+			"credits": 1000		
+		},
+		{
+			"id": 2,
+			"name": "Vasya Petrov",
+			"country": "Poland",
+			"credits": 1000
+		}
+	],
 	"cards": [
 		{
 			"id": 0,
 			"element": "https://by.visa.com/dam/VCOM/regional/ve/romania/blogs/hero-image/visa-logo-800x450.jpg",
 			"type": "visa",
-			"name": "Maks Kurmaz",
+			"name": "Andrey Pogorelov",
 			"primary": true,
 			"number": "**** 6775",
 			"expire": "11 / 24",
@@ -16,6 +36,17 @@
 			"element": "https://brandlogos.net/wp-content/uploads/2011/08/mastercard-logo.png",
 			"type": "master",
 			"name": "Andrey Pogorelov",
+			"primary": false,
+			"number": "**** 3009",
+			"expire": "11 / 24",
+			"country": "Ukraine",
+			"cvc": 228
+		},
+		{
+			"id": 2,
+			"element": "https://brandlogos.net/wp-content/uploads/2011/08/mastercard-logo.png",
+			"type": "master",
+			"name": "Maks Kurmaz",
 			"primary": false,
 			"number": "**** 3009",
 			"expire": "11 / 24",

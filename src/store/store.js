@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import reducer from "../components/PaymentForm/cardsSlice";
+import cards from "../components/PaymentForm/cardsSlice";
+import users from "./slices/userSlice";
 
 const store = configureStore({
-	reducer: reducer,
+	reducer: {cards, users},
 	middleware: getDefaultMiddleware => getDefaultMiddleware(),
 	devTools: process.env.NODE_ENV !== 'production',
 });
