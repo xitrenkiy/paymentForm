@@ -20,7 +20,6 @@ body {
 	min-width: 320px;
 	min-height: 100vh;
 }
-
 @theme {
 	--animate-slideIn63: slideIn63 .5s ease;
 	--animate-slideIn52: slideIn52 .5s ease;

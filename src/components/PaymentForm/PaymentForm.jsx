@@ -1,16 +1,33 @@
-import { useState } from "react";
-import { AddCard } from "./AddCard";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { AddCard } from "../AddCard/AddCard";
+import { CardDetail } from "../CardDetail/CardDetail";
 
-import { FaCcVisa, FaCcMastercard, FaBitcoin } from "react-icons/fa6";
+import { fetchCards } from "./cardsSlice";
+import { Loader } from "../Loader/Loader";
+
+import { FaBitcoin } from "react-icons/fa6";
 import { SiAdguard } from "react-icons/si";
-import { CardDetail } from "./CardDetail";
 
-const PaymentFormMyVariantJJJ = () => {
-	const [isAddModalOpen, setIsModalOpen] = useState(false);
+const PaymentForm = () => {
+	const { cards, cardsLoadingStatus } = useSelector(state => state);
+	const dispatch = useDispatch();
+	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [isCardModalOpen, setIsCardModalOpen] = useState(false);
+	const [activeCardType, setActiveCardType] = useState('visa');
 
-	const handleClickAddButton = (func) => {
-		func(!func);
+	useEffect(() => {
+		dispatch(fetchCards());
+	}, []);
+
+	const handleClickAddButton = (func, state) => {
+		func(!state);
+	}
+
+	const handleClickType = (type) => {
+		handleClickAddButton(setIsCardModalOpen, isCardModalOpen);
+		setActiveCardType(type);
 	}
 
 	return (
@@ -24,39 +41,37 @@ const PaymentFormMyVariantJJJ = () => {
 							<FaBitcoin style={{width: '25px', height: '25px'}}/>
 							<div className='text-2xl ml-1.5 font-bold'>$1,878<span className='opacity-50'>.67</span></div>
 						</div>
-						<button className='w-[100%] h-15 mt-5 text-white font-medium bg-blue-500 rounded-2xl cursor-pointer text-center flex items-center justify-center transition ease-in-out duration-200 hover:bg-blue-700'><span className='text-2xl mr-5 mb-1'>+</span> Buy Credits</button>
+						<Link to='/credits' className='w-[100%] h-15 mt-5 text-white font-medium bg-blue-500 rounded-2xl cursor-pointer text-center flex items-center justify-center transition ease-in-out duration-200 hover:bg-blue-700'><span className='text-2xl mr-5 mb-1'>+</span> Buy Credits</Link>
 					</div>
 				</div>
 
-				<div className='bg-white min-h-50 text-black px-4 py-4'>
+				<div className='bg-white min-h-50 relative text-black px-4 py-4'>
 					<div className='flex justify-between'>
 						<span className='font-medium'>Payment cards</span>
 						<button
 							className='text-blue-700 font-medium cursor-pointer'
-							onClick={handleClickAddButton}>
+							onClick={!isCardModalOpen ? () => handleClickAddButton(setIsAddModalOpen, isAddModalOpen) : null}>
 								+ Add card
 						</button>
 					</div>
 					<div className='mt-4'>
-						<div className='flex items-center relative mb-2'>
-							<FaCcVisa style={{width: '60px', height: '60px', color: 'blue'}} />
-							<div className='flex flex-col text-[14px] ml-4 tracking-wide'>
-								<div className='font-medium'>Domen Kralj<span className='ml-2 bg-gray-200 p-1 rounded-2xl text-[10px] text-blue-500'>Primary</span></div>
-								<div className='text-[11px] opacity-50 mt-1'>**** 6775</div>
-								<button className='absolute top-[50%] right-0 translate-y-[-50%] cursor-pointer hover:animate-ping' onClick={() => handleClickAddButton(setIsCardModalOpen)}>&gt;</button>
-							</div>
-						</div>
-
-						<div className='flex items-center relative'>
-							<FaCcMastercard style={{width: '60px', height: '60px'}} />
-							<div className='flex flex-col text-[14px] ml-4 tracking-wide'>
-								<div className='font-medium' onClick={handleClickAddButton}>Domen Kralj</div>
-								<div className='text-[11px] opacity-50 mt-1'>**** 3009</div>
-								<span className='absolute top-[50%] right-0 translate-y-[-50%] cursor-pointer hover:animate-ping'>&gt;</span>
-							</div>
-						</div>
+						{cardsLoadingStatus === 'loading' 
+							? <Loader /> 
+								: 
+							cards.map(item => {
+								return (
+									<div key={item.id} className='flex items-center relative mb-2'>
+										<img src={item.element} className='w-15 h-15 object-contain'/>
+										<div className='flex flex-col text-[14px] ml-4 tracking-wide'>
+											<div className='font-medium cursor-pointer' onClick={() => handleClickType(item.type)}>{item.name}{item.primary ? <span className='ml-2 bg-gray-200 p-1 rounded-2xl text-[10px] text-blue-500'>Primary</span> : null}</div>
+											<div className='text-[11px] opacity-50 mt-1'>{item.number}</div>
+											<span className='absolute top-[50%] right-0 translate-y-[-50%] cursor-pointer hover:animate-ping'>&gt;</span>
+										</div>
+									</div>
+								)
+							})}
 					</div>
-					<div className='flex items-center gap-4 mt-5 w-full bg-green-100 rounded-xl px-5 py-2'>
+					<div className='flex items-center gap-4 mt-5 w-full bg-green-100 rounded-xl px-5 py-2 bottom-0'>
 						<SiAdguard style={{width: '35px', height: '35px'}} />
 						<div className='text-[14px] font-light'>We're fully complaint with the payment card indrustry data security standarts</div>
 					</div>
@@ -80,11 +95,10 @@ const PaymentFormMyVariantJJJ = () => {
 				
 			</div>
 			
-			{isAddModalOpen ? <AddCard toggleModal={() => handleClickAddButton(setIsModalOpen)} /> : null}
-			{isCardModalOpen ? <CardDetail toggleModal={() => handleClickAddButton(setIsCardModalOpen)} /> : null}
+			{isAddModalOpen && !isCardModalOpen ? <AddCard toggleModal={() => handleClickAddButton(setIsAddModalOpen, isAddModalOpen)} /> : null}
+			{isCardModalOpen && !isAddModalOpen ? <CardDetail toggleModal={() => handleClickAddButton(setIsCardModalOpen, isCardModalOpen)} type={activeCardType} /> : null}
 		</div>
 	)
 }
 
-export default PaymentFormMyVariantJJJ;
-
+export default PaymentForm;

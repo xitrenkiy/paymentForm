@@ -1,20 +1,26 @@
 {
 	"cards": [
 		{
-			"id": "0",
-			"element": "<FaCcVisa style={{width: '60px', height: '60px', color: 'blue'}} />",
+			"id": 0,
+			"element": "https://by.visa.com/dam/VCOM/regional/ve/romania/blogs/hero-image/visa-logo-800x450.jpg",
 			"type": "visa",
-			"name": "Domen Kralj",
-			"primary": "true",
-			"number": "**** 6775"
+			"name": "Maks Kurmaz",
+			"primary": true,
+			"number": "**** 6775",
+			"expire": "11 / 24",
+			"country": "United States",
+			"cvc": 323
 		},
 		{
-			"id": "1",
-			"element": "<FaCcMastercard style={{width: '60px', height: '60px'}} />",
+			"id": 1,
+			"element": "https://brandlogos.net/wp-content/uploads/2011/08/mastercard-logo.png",
 			"type": "master",
-			"name": "Domen Kralj",
-			"primary": "false",
-			"number": "**** 3009"
+			"name": "Andrey Pogorelov",
+			"primary": false,
+			"number": "**** 3009",
+			"expire": "11 / 24",
+			"country": "Ukraine",
+			"cvc": 228
 		}
 	]
 }

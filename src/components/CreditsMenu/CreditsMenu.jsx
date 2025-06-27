@@ -1,12 +1,18 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
-
-import { FaCcMastercard } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+import useHttp from "../../hooks/http.hook";
 
 export const CreditsMenu = () => {
+	const [data, setData] = useState([]);
 	const [amountValue, setAmountValue] = useState(null);
 	const [customOpened, setCustomOpened] = useState(false);
-	const [open, setOpen] = useState(false);
+
+	const { request } = useHttp();
+
+	useEffect(() => {
+		request('http://localhost:3000/cards')
+			.then(setData)
+	}, [])
 
 	return (
 		<div className={`min-h-100 relative overflow-hidden w-100 mx-auto mt-20 rounded-2xl bg-gray-200`}>
