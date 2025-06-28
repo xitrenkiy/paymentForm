@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { createSelector } from "@reduxjs/toolkit";
 import { AddCard } from "../AddCard/AddCard";
 import { CardDetail } from "../CardDetail/CardDetail";
 
 import { fetchCards } from "./cardsSlice";
 import { fetchUsers } from "../../store/slices/userSlice";
+import { filteredUserCardsSelector } from "../../store/selectors/userSelector";
 import { Loader } from "../Loader/Loader";
 
 import { FaBitcoin } from "react-icons/fa6";
@@ -15,33 +15,30 @@ import { SiAdguard } from "react-icons/si";
 const PaymentForm = () => {
 	const { cards, cardsLoadingStatus } = useSelector(state => state.cards);
 	const { usersLoadingStatus } = useSelector(state => state.users);
-	const filteredUserCardsSelector = createSelector(
-		(state) => state.users.users,
-		(users) => users?.find(user => user.id == 0)
-	);
-	const activeUserId = useSelector(filteredUserCardsSelector);
+	const activeUser = useSelector(filteredUserCardsSelector);
 	const dispatch = useDispatch();
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [isCardModalOpen, setIsCardModalOpen] = useState(false);
-	const [activeCardType, setActiveCardType] = useState('visa');
-	
+	const [activeCardId, setActiveCardId] = useState(null);
+
 	useEffect(() => {
 		dispatch(fetchUsers());
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (activeUserId) {
-			dispatch(fetchCards(activeUserId.name));
+		if (activeUser) {
+			dispatch(fetchCards(activeUser.id));
 		}
-	}, [dispatch, activeUserId])
+	}, [dispatch, activeUser]);
+	
 
 	const handleClickAddButton = (func, state) => {
 		func(!state);
 	}
 
-	const handleClickType = (type) => {
+	const handleClickCard = (id) => {
 		handleClickAddButton(setIsCardModalOpen, isCardModalOpen);
-		setActiveCardType(type);
+		setActiveCardId(id);
 	}
 
 	return (
@@ -53,7 +50,7 @@ const PaymentForm = () => {
 						<div className='opacity-60 fw'>Your balance</div>
 						<div className='flex mt-1 items-center'>
 							<FaBitcoin style={{width: '25px', height: '25px'}}/>
-							<div className='text-2xl ml-1.5 font-bold'>$1,878<span className='opacity-50'>.67</span></div>
+							<div className='text-2xl ml-1.5 font-bold'>${activeUser?.credits}<span className='opacity-50'>.0</span></div>
 						</div>
 						<Link to='/credits' className='w-[100%] h-15 mt-5 text-white font-medium bg-blue-500 rounded-2xl cursor-pointer text-center flex items-center justify-center transition ease-in-out duration-200 hover:bg-blue-700'><span className='text-2xl mr-5 mb-1'>+</span> Buy Credits</Link>
 					</div>
@@ -69,7 +66,7 @@ const PaymentForm = () => {
 						</button>
 					</div>
 					<div className='mt-4'>
-						{cardsLoadingStatus === 'loading' 
+						{cardsLoadingStatus === 'loading' || usersLoadingStatus === 'loading' 
 							? <Loader /> 
 								: 
 							cards.map(item => {
@@ -77,8 +74,8 @@ const PaymentForm = () => {
 									<div key={item.id} className='flex items-center relative mb-2'>
 										<img src={item.element} className='w-15 h-15 object-contain'/>
 										<div className='flex flex-col text-[14px] ml-4 tracking-wide'>
-											<div className='font-medium cursor-pointer' onClick={() => handleClickType(item.type)}>{item.name}{item.primary ? <span className='ml-2 bg-gray-200 p-1 rounded-2xl text-[10px] text-blue-500'>Primary</span> : null}</div>
-											<div className='text-[11px] opacity-50 mt-1'>{item.number}</div>
+											<div className='font-medium cursor-pointer' onClick={() => handleClickCard(item.id)}>{item.name}{item.primary ? <span className='ml-2 bg-gray-200 p-1 rounded-2xl text-[10px] text-blue-500'>Primary</span> : null}</div>
+											<div className='text-[11px] opacity-50 mt-1'>{`**** ${item?.number.slice(14)}`}</div>
 											<span className='absolute top-[50%] right-0 translate-y-[-50%] cursor-pointer hover:animate-ping'>&gt;</span>
 										</div>
 									</div>
@@ -90,7 +87,7 @@ const PaymentForm = () => {
 							<SiAdguard style={{width: '35px', height: '35px'}} />
 							<div className='text-[14px] font-light'>We're fully complaint with the payment card indrustry data security standarts</div>
 						</div> : null}
-						{cards.length === 0 && cardsLoadingStatus !=='loading' && usersLoadingStatus !=='loading' ? <div className='w-full mx-auto text-center'>
+						{cards.length === 0 && cardsLoadingStatus !=='loading' && usersLoadingStatus !=='idle' && cardsLoadingStatus !=='idle' ? <div className='w-full mx-auto text-center'>
 							Seems like you don`t have a card
 						</div> : null}
 				</div>
@@ -114,7 +111,7 @@ const PaymentForm = () => {
 			</div>
 			
 			{isAddModalOpen && !isCardModalOpen ? <AddCard toggleModal={() => handleClickAddButton(setIsAddModalOpen, isAddModalOpen)} /> : null}
-			{isCardModalOpen && !isAddModalOpen ? <CardDetail toggleModal={() => handleClickAddButton(setIsCardModalOpen, isCardModalOpen)} type={activeCardType} /> : null}
+			{isCardModalOpen && !isAddModalOpen ? <CardDetail toggleModal={() => handleClickAddButton(setIsCardModalOpen, isCardModalOpen)} id={activeCardId} /> : null}
 		</div>
 	)
 }

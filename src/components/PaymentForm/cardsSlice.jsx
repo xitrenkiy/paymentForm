@@ -8,9 +8,9 @@ const initialState = {
 
 export const fetchCards = createAsyncThunk(
 	'cards/fetchCards',
-	async (name) => {
+	async (id) => {
 		const { request } = useHttp();
-		return await request(`http://localhost:3000/cards?name=${name}`)
+		return await request(`http://localhost:3000/cards?userId=${id}`)
 	}
 )
 

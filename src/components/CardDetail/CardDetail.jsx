@@ -1,19 +1,31 @@
+import { useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import useHttp from '../../hooks/http.hook';
 
 import { cardDeleted, cardPrimaryToggle } from "../PaymentForm/cardsSlice";
 
-export const CardDetail = ({ toggleModal, type }) => {
+export const CardDetail = ({ toggleModal, id }) => {
+	const { request } = useHttp();
+	const [isCardNumberClicked, setIsCardNumberClicked] = useState(true);
 	const { cards } = useSelector(state => state.cards);
 	const dispatch = useDispatch();
-	const openedCard = cards.find(card => card.type === type);
+	const openedCard = cards.find(card => card.id === id);
 
-	const handleClickDeleteButton = () => {
-		toggleModal();
-		dispatch(cardDeleted(openedCard.id));
+	const handleCardNumberClick = () => {
+		setIsCardNumberClicked(state => !state)
 	}
 
+	const handleClickDeleteButton = useCallback((e, id) => {
+		e.preventDefault();
+		toggleModal();
+		request(`http://localhost:3000/cards/${id}`, 'DELETE')
+			.then(data => console.log(data, 'deleted'))
+			.then(() => dispatch(cardDeleted(openedCard.id)))
+			.catch(e => console.error(e));
+	}, [request])
+
 	return (
-		<div className='absolute overflow-hidden w-full h-[398px] bg-white bottom-0 rounded-xl text-black p-5 animate-slideIn52'>
+		<div className='absolute overflow-hidden w-full min-h-[398px] bg-white bottom-0 rounded-xl text-black p-5'>
 			<div className='flex justify-between'>
 				<h2 className='font-medium'>Card details</h2>
 				<button className='cursor-pointer' onClick={toggleModal}>⨉</button>
@@ -25,7 +37,7 @@ export const CardDetail = ({ toggleModal, type }) => {
 						<img src={openedCard.element} className='w-15 h-15 object-contain'/>
 						<div className='flex flex-col text-[14px] ml-4 tracking-wide'>
 							<div className='font-medium'>{openedCard.name}{openedCard.primary ? <span className='ml-2 bg-gray-200 p-1 rounded-2xl text-[10px] text-blue-500'>Primary</span> : null}</div>
-							<div className='text-[11px] opacity-50 mt-1'>{openedCard.number}</div>
+							<div onClick={handleCardNumberClick} className='cursor-pointer text-[11px] opacity-50 mt-1'>{isCardNumberClicked ? openedCard.number : `**** ${openedCard?.number.slice(14)}`}</div>
 						</div>
 					</div>
 					
@@ -44,10 +56,14 @@ export const CardDetail = ({ toggleModal, type }) => {
 							<p className='font-medium text-right'>{openedCard.cvc}</p>
 						</div>
 					</div>
+					<div className='mt-2'>
+						<h2 className='font-light'>Money</h2>
+						<p className='font-medium'>${openedCard.money}</p>
+					</div>
 				</div>
 				<button 
 					className='cursor-pointer text-red-500 font-bold mt-5'
-					onClick={handleClickDeleteButton}>
+					onClick={(e) => handleClickDeleteButton(e, openedCard.id)}>
 					Delete card
 				</button>
 				<button

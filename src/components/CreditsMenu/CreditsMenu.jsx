@@ -1,18 +1,55 @@
 import { Link } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
 import { useEffect, useState } from "react";
 import useHttp from "../../hooks/http.hook";
 
+import { fetchUsers } from "../../store/slices/userSlice";
+import { fetchCards } from "../PaymentForm/cardsSlice";
+import { filteredUserCardsSelector } from "../../store/selectors/userSelector";
+
 export const CreditsMenu = () => {
-	const [data, setData] = useState([]);
+	const { cards, cardsLoadingStatus } = useSelector(state => state.cards);
+	const activeUser = useSelector(filteredUserCardsSelector);
+	const dispatch = useDispatch();
 	const [amountValue, setAmountValue] = useState(null);
+	const [fromCard, setFromCard] = useState('');
 	const [customOpened, setCustomOpened] = useState(false);
+	const currentCard = cards.find(card => card.number == fromCard);
 
 	const { request } = useHttp();
 
 	useEffect(() => {
-		request('http://localhost:3000/cards')
-			.then(setData)
-	}, [])
+		dispatch(fetchUsers());
+	}, [dispatch]);
+
+	useEffect(() => {
+		if (activeUser) {
+			dispatch(fetchCards(activeUser.id))
+		}
+	}, [dispatch, activeUser]);
+
+	const handlePayMoney = () => {
+		if (!fromCard || !amountValue || amountValue === 'custom' || amountValue < 0 || !activeUser || !currentCard) return;
+
+		if (error || currentCard?.money < amountValue) {
+			return;
+		}
+
+		const fromData = {
+			money: currentCard?.money - amountValue
+		}
+
+		const toData = {
+			credits: activeUser?.credits + amountValue
+		}
+
+		try {
+			request(`http://localhost:3000/cards/${currentCard.id}`, "PATCH", JSON.stringify(fromData))
+			request(`http://localhost:3000/users/${activeUser.id}`, "PATCH", JSON.stringify(toData))
+		} catch(e) {
+			throw e
+		}
+	}
 
 	return (
 		<div className={`min-h-100 relative overflow-hidden w-100 mx-auto mt-20 rounded-2xl bg-gray-200`}>
@@ -20,6 +57,8 @@ export const CreditsMenu = () => {
 					<Link to='/' className='cursor-pointer'>&lt;</Link>
 					<span className='text-[10] ml-8 font-medium'>Buy credits</span>
 				</div>
+
+				<div className='mt-4 p-3 bg-white w-full text-black font-medium'>{currentCard ? `You have: $${currentCard.money}` : 'Please choose card'}</div>
 
 				<div className='text-black mt-4 bg-white min-h-40 p-5 font-medium'>
 					<h2>Choose amount</h2>
@@ -74,7 +113,24 @@ export const CreditsMenu = () => {
 
 				<div className='mt-5 bg-white text-black p-5'>
 					<h2 className='font-medium'>Payment method</h2>
-					
+					<label htmlFor="fromCard">From</label>
+					<select name="fromCard" id="fromCard" className='block mb-3 w-full border border-gray-300 rounded' onChange={(e) => setFromCard(e.target.value)}>
+						<option value=''>Select card</option>
+						{cards.map(card => {
+							return (
+								<option 
+									key={card.id} 
+									value={card.number}>
+										{card.number} / {card.name}
+								</option>
+							)
+						})}
+					</select>
+					<label htmlFor="toCard">To</label>
+					<select disabled name="toCard" id="toCard" className='block w-full border border-gray-300 rounded'>
+						<option value=''>{activeUser?.name}</option>
+					</select>
+					<button className='w-full mt-5 bg-blue-300 p-2.5 transition-colors duration-200 cursor-pointer rounded-2xl hover:bg-blue-500 hover:text-white' onClick={handlePayMoney}>Pay that damn money</button>
 				</div>
 			</div>
 	)
