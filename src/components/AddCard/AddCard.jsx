@@ -4,7 +4,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as yup from 'yup';
 import useHttp from '../../hooks/http.hook';
 
-import { cardAdded } from '../PaymentForm/cardsSlice';
+import { cardAdded } from '../../store/slices/cardsSlice';
 import { filteredUserCardsSelector } from '../../store/selectors/userSelector';
 
 const date = new Date();
@@ -96,16 +96,16 @@ export const AddCard = ({ toggleModal }) => {
 
 					<div className='flex justify-between items-center mt-2'>
 						<div className='font-medium'>Do it primary?</div>
-						<Field type="checkbox" name='primary' className='appearance-none cursor-pointer relative w-12 h-6 transition-transform duration-200 px-0.5 rounded-2xl bg-black/65 before:block before:transition-transform before:duration-200 before:w-5 before:h-5 before:bg-white before:rounded-4xl before:absolute before:top-[50%] before:translate-y-[-50%] checked:bg-blue-700 checked:before:translate-x-6'/>
+						<Field type="checkbox" name='primary' className='appearance-none cursor-pointer relative w-12 h-6 transition-transform duration-200 px-0.5 rounded-2xl bg-black/65 before:block before:transition-transform before:duration-200 before:w-5 before:h-5 before:bg-white before:rounded-4xl before:absolute before:top-[50%] before:translate-y-[-50%] checked:bg-blue-700 checked:before:translate-x-6' />
 					</div>
 
 				</div>
 				<div className='mt-5'>
 					<h2 className='font-medium text-[14px]'>Card Details</h2>
 
-					<Field 
-						name='cardNumber' 
-						className='border border-gray-300 w-full rounded p-2 mt-2' 
+					<Field
+						name='cardNumber'
+						className='border border-gray-300 w-full rounded p-2 mt-2'
 						placeholder='Card number'
 					/>
 					<ErrorMessage component='div' name='cardNumber' className='text-red-700' />

@@ -18,23 +18,26 @@ const userSlice = createSlice({
 	name: 'user',
 	initialState,
 	reducer: {
-		'addUser': (state, action) => {
+		addUser: (state, action) => {
 			state.users.push(action.payload)
+		},
+		deleteUser: (state, action) => {
+			state.users.filter(user => user.id !== action.payload)
 		}
 	},
 	extraReducers: (builder) => {
 		builder
-			.addCase(fetchUsers.pending, state => {state.usersLoadingStatus = 'loading'})
+			.addCase(fetchUsers.pending, state => { state.usersLoadingStatus = 'loading' })
 			.addCase(fetchUsers.fulfilled, (state, action) => {
 				state.usersLoadingStatus = 'idle';
 				state.users = action.payload;
 			})
-			.addCase(fetchUsers.rejected, state => {state.usersLoadingStatus = 'error'})
-			.addDefaultCase(() => {})
+			.addCase(fetchUsers.rejected, state => { state.usersLoadingStatus = 'error' })
+			.addDefaultCase(() => { })
 	}
 })
 
 const { actions, reducer } = userSlice;
 
-export const { addUser } = userSlice.actions;
+export const { addUser } = actions;
 export default reducer;

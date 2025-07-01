@@ -4,7 +4,7 @@
       "id": "0",
       "name": "Andrey Pogorelov",
       "country": "Ukraine",
-      "credits": 1000
+      "credits": 1200
     },
     {
       "id": "1",
@@ -84,6 +84,19 @@
       "expire": "05 / 2029",
       "country": "United States",
       "cvc": "943"
+    },
+    {
+      "id": "OCx4WMeJXEoK-0JUcnOl3",
+      "userId": "0",
+      "element": "https://by.visa.com/dam/VCOM/regional/ve/romania/blogs/hero-image/visa-logo-800x450.jpg",
+      "type": "visa",
+      "name": "Andrey Pogorelov",
+      "primary": true,
+      "number": "1234 1234 1234 1123",
+      "expire": "06 / 2029",
+      "country": "England",
+      "cvc": "378",
+      "money": null
     }
   ]
 }
