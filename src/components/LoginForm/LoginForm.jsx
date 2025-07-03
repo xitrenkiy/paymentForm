@@ -6,19 +6,23 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { setUser } from "../../store/slices/useSlice";
+import { setUser, startLoading } from "../../store/slices/useSlice";
 
 const LoginForm = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const handleLogin = (email, password) => {
-		signInWithEmailAndPassword(auth, email, password)
-			.then(({ user }) => dispatch(setUser({
-				id: user.uid,
-				email: user.email,
-				token: user.accessToken
-			})))
+	const handleLogin = async (email, password) => {
+		dispatch(startLoading());
+		await signInWithEmailAndPassword(auth, email, password)
+			.then(({ user }) =>
+				dispatch(setUser({
+					id: user.uid,
+					email: user.email,
+					token: user.accessToken,
+					loading: false
+				}))
+			)
 			.then(navigate('/'))
 	}
 

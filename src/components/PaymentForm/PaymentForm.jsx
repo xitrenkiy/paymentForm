@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
 import { auth } from "../../config";
@@ -9,7 +10,6 @@ import { Loader } from "../Loader/Loader";
 import { AddCard } from "../AddCard/AddCard";
 import { CardDetail } from "../CardDetail/CardDetail";
 
-import { removeUser } from "../../store/slices/useSlice";
 import { fetchCards } from "../../store/slices/cardsSlice";
 import { fetchUsers } from "../../store/slices/userSlice";
 import { filteredUserCardsSelector } from "../../store/selectors/userSelector";
@@ -18,12 +18,13 @@ import { FaBitcoin } from "react-icons/fa6";
 import { SiAdguard } from "react-icons/si";
 
 const PaymentForm = () => {
-	console.log(auth);
-
 	const { cards, cardsLoadingStatus } = useSelector((state) => state.cards);
 	const { usersLoadingStatus } = useSelector((state) => state.users);
 	const activeUser = useSelector(filteredUserCardsSelector);
+
 	const dispatch = useDispatch();
+	const navigate = useNavigate();
+
 	const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 	const [isCardModalOpen, setIsCardModalOpen] = useState(false);
 	const [activeCardId, setActiveCardId] = useState(null);
@@ -49,7 +50,7 @@ const PaymentForm = () => {
 
 	const handleLogOut = () => {
 		signOut(auth)
-			.then(dispatch(removeUser()))
+			.then(navigate('/login'))
 	}
 
 	return (

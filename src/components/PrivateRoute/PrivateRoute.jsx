@@ -1,16 +1,20 @@
-import { auth } from "../../config";
 import { Navigate, Outlet } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-const PrivateRoute = ({ children }) => {
-	// const { accessToken } = auth;
-	const { token } = useSelector(state => state.user);
-	console.log(token);
+import { Loader } from "../Loader/Loader";
+
+const PrivateRoute = () => {
+	const { token, loading } = useSelector(state => state.user);
+
+	if (loading) {
+		return <Loader />
+	}
 
 	if (!token) {
 		return <Navigate to='/registration' replace />
 	}
 
-	return children ? children : <Outlet />;
+	return <Outlet />;
 }
+
 export default PrivateRoute;

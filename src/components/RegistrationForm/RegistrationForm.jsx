@@ -3,16 +3,17 @@ import { auth } from '../../config';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-import { setUser } from '../../store/slices/useSlice';
-//navigate('/')
+import { setUser, startLoading } from '../../store/slices/useSlice';
+
 import Form from '../Form/Form';
 
 const RegistrationForm = () => {
 	const dispatch = useDispatch();
 	const navigate = useNavigate();
 
-	const handleRegister = (email, password) => {
-		createUserWithEmailAndPassword(auth, email, password)
+	const handleRegister = async (email, password) => {
+		dispatch(startLoading());
+		await createUserWithEmailAndPassword(auth, email, password)
 			.then(({ user }) => dispatch(setUser({
 				id: user.uid,
 				email: user.email,
