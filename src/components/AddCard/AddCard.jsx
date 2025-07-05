@@ -2,10 +2,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { nanoid } from '@reduxjs/toolkit';
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as yup from 'yup';
-import useHttp from '../../hooks/http.hook';
+
+import { db } from '../../config';
+import { doc, setDoc } from 'firebase/firestore';
 
 import { cardAdded } from '../../store/slices/cardsSlice';
-import { filteredUserCardsSelector } from '../../store/selectors/userSelector';
 
 const date = new Date();
 
@@ -41,31 +42,34 @@ const validationSchema = yup.object().shape({
 })
 
 export const AddCard = ({ toggleModal }) => {
-	const { request } = useHttp();
-	const activeUser = useSelector(filteredUserCardsSelector);
+	const { id } = useSelector(state => state.user);
 	const dispatch = useDispatch();
 
 	return (
 		<Formik
 			initialValues={initialValues}
-			onSubmit={(values, { setSubmitting }) => {
-				console.log('Form submitted', values);
-				const newCard = {
-					id: nanoid(),
-					userId: activeUser.id,
-					element: values.type === 'visa' ? "https://by.visa.com/dam/VCOM/regional/ve/romania/blogs/hero-image/visa-logo-800x450.jpg" : "https://brandlogos.net/wp-content/uploads/2011/08/mastercard-logo.png",
-					type: values.type,
-					name: values.fullName,
-					primary: values.primary,
-					number: formatCardNumber(values.cardNumber),
-					expire: values.expire,
-					country: values.country,
-					cvc: values.cvc
+			onSubmit={async (values) => {
+				try {
+					console.log('Form submitted', values);
+					const newCard = {
+						id: nanoid(),
+						userId: id,
+						element: values.type === 'visa' ? "https://by.visa.com/dam/VCOM/regional/ve/romania/blogs/hero-image/visa-logo-800x450.jpg" : "https://brandlogos.net/wp-content/uploads/2011/08/mastercard-logo.png",
+						type: values.type,
+						name: values.fullName,
+						primary: values.primary,
+						money: 1000,
+						number: formatCardNumber(values.cardNumber),
+						expire: values.expire,
+						country: values.country,
+						cvc: values.cvc,
+					}
+					await setDoc(doc(db, 'cards', `${newCard.id}`), newCard);
+					dispatch(cardAdded(newCard));
+				} catch (e) {
+					console.log('Can`t catch penis', e);
 				}
-				request('http://localhost:3000/cards', 'POST', JSON.stringify(newCard))
-					.then(() => dispatch(cardAdded(newCard)))
-					.catch(e => console.error(e))
-					.finally(() => setSubmitting(false))
+				toggleModal();
 			}}
 			validationSchema={validationSchema}
 		>

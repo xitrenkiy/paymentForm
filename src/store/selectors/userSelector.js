@@ -1,4 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { auth } from '../../config/';
 
 export const filteredUserCardsSelector = createSelector(
 	(state) => state.users.users,

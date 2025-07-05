@@ -3,14 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { Link } from "react-router-dom";
-import { auth } from "../../config";
+import { auth, db } from "../../config";
 import { signOut } from "firebase/auth";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 import { Loader } from "../Loader/Loader";
 import { AddCard } from "../AddCard/AddCard";
 import { CardDetail } from "../CardDetail/CardDetail";
 
-import { fetchCards } from "../../store/slices/cardsSlice";
+import { setCards } from "../../store/slices/cardsSlice";
 import { fetchUsers } from "../../store/slices/userSlice";
 import { filteredUserCardsSelector } from "../../store/selectors/userSelector";
 
@@ -34,16 +35,29 @@ const PaymentForm = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (activeUser) {
-			dispatch(fetchCards(activeUser.id));
+		async function fetchData() {
+			try {
+				const q = query(collection(db, 'cards'), where('userId', '==', auth.currentUser.uid));
+				const querySnapshot = await getDocs(q);
+
+				const data = querySnapshot.docs.map((d) => ({
+					id: d.id,
+					...d.data()
+				}))
+
+				dispatch(setCards(data));
+			} catch (e) {
+				console.log('Error catching db', e);
+			}
 		}
-	}, [dispatch, activeUser]);
+		fetchData()
+	}, [dispatch])
 
 	const handleClickAddButton = (func, state) => {
 		func(!state);
 	};
 
-	const handleClickCard = (id) => {
+	const handleClickCard = async (id) => {
 		handleClickAddButton(setIsCardModalOpen, isCardModalOpen);
 		setActiveCardId(id);
 	};

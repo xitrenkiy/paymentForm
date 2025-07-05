@@ -8,7 +8,7 @@ import { fetchCards } from "../../store/slices/cardsSlice";
 import { filteredUserCardsSelector } from "../../store/selectors/userSelector";
 
 export const CreditsMenu = () => {
-	const { cards, cardsLoadingStatus } = useSelector(state => state.cards);
+	const { cards } = useSelector(state => state.cards);
 	const activeUser = useSelector(filteredUserCardsSelector);
 
 	const dispatch = useDispatch();
@@ -26,10 +26,29 @@ export const CreditsMenu = () => {
 	}, [dispatch]);
 
 	useEffect(() => {
-		if (activeUser) {
-			dispatch(fetchCards(activeUser.id))
+		async function fetchData() {
+			try {
+				const q = query(collection(db, 'cards'), where('userId', '==', auth.currentUser.uid));
+				const querySnapshot = await getDocs(q);
+
+				const data = querySnapshot.docs.map((d) => ({
+					id: d.id,
+					...d.data()
+				}))
+
+				dispatch(setCards(data));
+			} catch (e) {
+				console.log('Error catching db', e);
+			}
 		}
-	}, [dispatch, activeUser]);
+		fetchData()
+	}, [dispatch])
+
+	// useEffect(() => {
+	// 	if (activeUser) {
+	// 		dispatch(fetchCards(activeUser.id))
+	// 	}
+	// }, [dispatch, activeUser]);
 
 	const handlePayMoney = () => {
 		if (!fromCard || !amountValue || amountValue === 'custom' || amountValue < 0 || !activeUser || !currentCard) return;
@@ -46,7 +65,7 @@ export const CreditsMenu = () => {
 			request(`http://localhost:3000/cards/${currentCard.id}`, "PATCH", JSON.stringify(fromData))
 			request(`http://localhost:3000/users/${activeUser.id}`, "PATCH", JSON.stringify(toData))
 		} catch (e) {
-			throw e
+			console.log('Error', e);
 		}
 	}
 

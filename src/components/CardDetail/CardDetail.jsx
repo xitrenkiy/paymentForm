@@ -1,11 +1,12 @@
 import { useCallback, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import useHttp from '../../hooks/http.hook';
+
+import { db } from "../../config";
+import { doc, deleteDoc } from "firebase/firestore";
 
 import { cardDeleted, cardPrimaryToggle } from "../../store/slices/cardsSlice";
 
 export const CardDetail = ({ toggleModal, id }) => {
-	const { request } = useHttp();
 	const [isCardNumberClicked, setIsCardNumberClicked] = useState(true);
 	const { cards } = useSelector(state => state.cards);
 	const dispatch = useDispatch();
@@ -15,14 +16,16 @@ export const CardDetail = ({ toggleModal, id }) => {
 		setIsCardNumberClicked(state => !state)
 	}
 
-	const handleClickDeleteButton = useCallback((e, id) => {
-		e.preventDefault();
-		toggleModal();
-		request(`http://localhost:3000/cards/${id}`, 'DELETE')
-			.then(data => console.log(data, 'deleted'))
-			.then(() => dispatch(cardDeleted(openedCard.id)))
-			.catch(e => console.error(e));
-	}, [request])
+	const handleClickDeleteButton = useCallback(async (e, id) => {
+		try {
+			toggleModal();
+
+			await deleteDoc(doc(db, 'cards', id));
+			dispatch(cardDeleted(id));
+		} catch (error) {
+			console.log('Error', e);
+		}
+	}, [dispatch])
 
 	return (
 		<div className='absolute overflow-hidden w-full min-h-[398px] bg-white bottom-0 rounded-xl text-black p-5'>

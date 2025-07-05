@@ -21,7 +21,7 @@ const Form = ({ title, handleClick, isRegister = true }) => {
 		<Formik
 			initialValues={initialValues}
 			validationSchema={validationSchema}
-			onSubmit={values => handleClick(values.email, values.password)}
+			onSubmit={values => handleClick(values.email, values.password, values.name)}
 		>
 			<div className='w-[20rem] min-h-[200px] fixed top-[50%] left-[50%] translate-[-50%] backdrop-blur-[1px] bg-black/40 rounded'>
 				<FormikForm className='flex flex-col gap-3 justify-center items-center rounded text-white'>

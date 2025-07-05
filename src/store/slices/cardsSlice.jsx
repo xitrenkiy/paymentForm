@@ -26,6 +26,9 @@ const cardsSlice = createSlice({
 		},
 		cardPrimaryToggle: (state, action) => {
 			state.cards.forEach(card => card.primary = card.id === action.payload)
+		},
+		setCards: (state, action) => {
+			state.cards = action.payload
 		}
 	},
 	extraReducers: (builder) => {
@@ -42,5 +45,5 @@ const cardsSlice = createSlice({
 
 const { actions, reducer } = cardsSlice;
 
-export const { cardAdded, cardDeleted, cardPrimaryToggle } = actions;
+export const { cardAdded, cardDeleted, cardPrimaryToggle, setCards } = actions;
 export default reducer;
